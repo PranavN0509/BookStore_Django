@@ -1,0 +1,193 @@
+{% extends 'base/base.html' %}
+
+{% block start %}
+<section class="section-content padding-y">
+    <div class="container">
+    
+    <div class="row">
+        <main class="col-md-9">
+    <div class="card">
+    
+    <table class="table table-borderless table-shopping-cart">
+    <thead class="text-muted">
+    <tr class="small text-uppercase">
+      <th scope="col">Book</th>
+      <th scope="col" width="120">Quantity</th>
+      <th scope="col" width="120">Price</th>
+      <th scope="col" class="text-right" width="200"> </th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in cart.cart_items.all %}    
+    <tr>
+        <td>
+            <figure class="itemside">
+                <div class="aside"><img style="object-fit:contain;" src="/media/{{item.book.coverpage}}" class="img-sm"></div>
+                {% comment %} {{item.book.book_images.all.first.image}} {% endcomment %}
+                <figcaption class="info">
+                    <a href="{% url 'Books:get_book' item.book.slug %}" class="title text-dark">{{item.book.name}}</a>
+                    <p class="text-muted small">Size: XL, Color: blue, <br> Brand: Gucci</p>
+                </figcaption>
+            </figure>
+        </td>
+        <td> 
+            <input type="number" min="1" class="books_quantity{{item.uid}}" value="{{item.book_in_cart}}" required>
+            <a data-item="{{item.uid}}" class="update-book-qty btn btn-primary mt-3">Update</a>
+            
+        </td>
+        <td> 
+            <div class="price-wrap"> 
+                <var class="price">Rs. {{item.get_book_price}}</var> 
+                <small class="text-muted">Rs. {{item.book.price}}.00 per book</small> 
+            </div> <!-- price-wrap .// -->
+        </td>
+        <td class="text-right"> 
+        <!-- <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-light" data-toggle="tooltip"> <i class="fa fa-heart"></i></a>  -->
+        <a href="{% url 'accounts:remove_cart' item.uid %}" class="btn btn-light"> Remove</a>
+        </td>
+    </tr>
+    {% endfor %}
+    <!-- <tr>
+        <td>
+            <figure class="itemside">
+                <div class="aside"><img src="images/items/2.jpg" class="img-sm"></div>
+                <figcaption class="info">
+                    <a href="#" class="title text-dark">Product name  goes here nice</a>
+                    <p class="text-muted small">Size: XL, Color: blue, <br> Brand: Gucci</p>
+                </figcaption>
+            </figure>
+        </td>
+        <td> 
+            <select class="form-control">
+                <option>1</option>
+                <option>2</option>	
+                <option>3</option>	
+                <option>4</option>	
+            </select> 
+        </td>
+        <td> 
+            <div class="price-wrap"> 
+                <var class="price">$149.97</var> 
+                <small class="text-muted"> $75.00 each </small>  
+            </div> 
+            price-wrap .//
+        </td>
+        <td class="text-right"> 
+        <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-light" data-toggle="tooltip"> <i class="fa fa-heart"></i></a> 
+        <a href="" class="btn btn-light btn-round"> Remove</a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <figure class="itemside">
+                <div class="aside"><img src="images/items/3.jpg" class="img-sm"></div>
+                <figcaption class="info">
+                    <a href="#" class="title text-dark">Another name of some product goes just here as a demo text </a>
+                    <p class="small text-muted">Size: XL, Color: blue,  Brand: Tissot</p>
+                </figcaption>
+            </figure>
+        </td>
+        <td> 
+            <select class="form-control">
+                <option>1</option>
+                <option>2</option>	
+                <option>3</option>	
+            </select> 
+        </td>
+        <td> 
+            <div class="price-wrap"> 
+                <var class="price">$98.00</var> 
+                <small class="text-muted"> $578.00 each</small> 
+            </div> 
+            price-wrap .//
+
+        </td>
+        <td class="text-right"> 
+            <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-light" data-toggle="tooltip"> <i class="fa fa-heart"></i></a> 
+            <a href="" class="btn btn-light btn-round"> Remove</a>
+        </td>
+    </tr> -->
+    </tbody>
+    </table>
+    
+    <div class="card-body border-top">
+        <a href="{% url 'home:allbooks' %}" class="btn btn-light"> <i class="fa fa-chevron-left"></i> Continue shopping </a>
+        {% if cart.cart_items.all %}
+        <a href="{% url 'order:order-create' %}" class="btn btn-primary float-md-right"> Make Purchase <i class="fa fa-chevron-right"></i></a>
+        {% else %}
+        <a href="{% url 'order:order-create' %}" class="btn btn-primary float-md-right" style="display: none;"> Make Purchase <i class="fa fa-chevron-right"></i></a>
+        {% endif %}
+    </div>	
+    </div> <!-- card.// -->
+    
+    <!--<div class="alert alert-success mt-3">
+        <p class="icontext"><i class="icon text-success fa fa-truck"></i> Free Delivery within 1-2 weeks</p>
+    </div>-->
+    
+        </main> <!-- col.// -->
+        <aside class="col-md-3">
+            <div class="card mb-3">
+                <div class="card-body">
+                <form method="POST">
+                    {% include "base/alert.html" %}
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Have coupon?</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control mt-2" name="coupon" placeholder="Coupon code">
+                            <span class="input-group-append"> 
+                                <button type="submit" class="btn btn-primary mt-2 mx-2">Apply</button>
+                            </span>
+                        </div>
+                    </div>
+                    {% if cart.coupon %}
+                        <a href="{% url "accounts:remove_coupon" cart.uid %}" class="btn btn-success mt-3"><b>X</b> {{cart.coupon.coupon_code}}</a>
+                    {% endif %}
+                </form>
+                </div> <!-- card-body.// -->
+            </div>  <!-- card .// -->
+            <div class="card">
+                <div class="card-body">
+                        <dl class="dlist-align">
+                          <dt>Total price:</dt>
+                          <dd class="text-right">Rs. {{cart_items_total}}.00</dd>
+                        </dl>
+                        {% if cart.coupon %}
+                        <dl class="dlist-align">
+                          <dt>Discount:</dt>
+                          <dd class="text-right">Rs. {{cart.coupon.discount_price}}</dd>
+                        </dl>
+                        <dl class="dlist-align">
+                          <dt>Total:</dt>
+                          <dd class="text-right  h5"><strong>Rs. {{cart_items_total_afterdiscount}}</strong></dd>
+                        </dl>
+                        {% endif %}
+                        <hr>
+                        <p class="text-center mb-3">
+                            <img src="/media/images/misc/payments.png" height="26">
+                        </p>
+                        
+                </div> <!-- card-body.// -->
+            </div>  <!-- card .// -->
+        </aside> <!-- col.// -->
+    </div>
+    
+    </div> <!-- container .//  -->
+    </section>
+
+
+
+<script>
+        $(".update-book-qty").click(function(){
+            let item_uid = $(this).attr("data-item");
+            console.log(item_uid)
+            let updated_no_books = $(".books_quantity"+item_uid).val();
+            console.log(updated_no_books)
+            location.reload(true);
+            $.ajax({
+                url: `/accounts/update-cart/${item_uid}/${updated_no_books}`,
+            })
+      
+        })
+</script>    
+{% endblock  %}

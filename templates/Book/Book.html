@@ -1,0 +1,423 @@
+{% extends 'base/base.html' %}
+
+{% block start %}
+<style>
+  #message_addtocart{
+    display: none;
+    background-color: rgb(158, 219, 158);
+    color: green;
+    width: 100%;
+    font-size: 1.3rem;
+    height: 3.2rem;
+    padding: .5rem 8rem;
+  }
+</style>
+<link rel="stylesheet" href="/media/css/books_slider_style.css">
+
+<div id="message_addtocart"></div>
+<section class="section-content padding-y bg">
+  <div class="container">
+
+    <!-- ============================ COMPONENT 1 ================================= -->
+    <div class="card">
+      <div class="row no-gutters">
+        <aside class="col-md-6">
+          <article class="gallery-wrap">
+            <div class="img-big-wrap">
+              <div><a href="#"><img src="/media/{{book.coverpage}}"></a></div>
+            </div> <!-- slider-product.// -->
+            <div class="thumbs-wrap">
+              {% if book.book_images.all %}
+                {% for image in book.book_images.all %}
+                  <a href="" class="item-thumb"> <img src="/media/{{image.image}}"></a>
+                {% endfor %}
+              {% endif %}
+            </div> <!-- slider-nav.// -->
+          </article> <!-- gallery-wrap .end// -->
+        </aside>
+        <main class="col-md-6 border-left">
+          <article class="content-body">
+
+            <h2 class="title">{{book.name}}</h2>
+
+            {% comment %} <div class="rating-wrap my-3">
+              <ul class="rating-stars">
+                <li style="width: 80%;" class="stars-active">
+                  <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                  <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                  <i class="fa fa-star"></i>
+                </li>
+                <li>
+                  <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                  <i class="fa fa-star"></i> <i class="fa fa-star"></i>
+                  <i class="fa fa-star"></i>
+                </li>
+              </ul>
+              <small class="label-rating text-success">
+                <i class="fa fa-clipboard-check"></i> 154 orders
+              </small>
+            </div> <!-- rating-wrap.// --> {% endcomment %}
+
+            <div class="mb-3 mt-5">
+              <var class="price h4" id="book_price">Rs. {{book.price}}.00</var>
+            </div> <!-- price-detail-wrap .// -->
+
+            <p><b>Description:</b>
+              {{book.description}}
+            </p>
+
+
+            <dl class="row">
+              <dt class="col-sm-3">Author:</dt>
+              <dd class="col-sm-9"><a href="{% url 'Books:get_writer' book.writer.slug %}">{{book.writer}}</a></dd>
+
+              <dt class="col-sm-3">Stock Available:</dt>
+              <dd class="col-sm-9">{{book.stock}}</dd>
+
+              <!-- <dt class="col-sm-3">Delivery</dt>
+              <dd class="col-sm-9">Russia, USA, and Europe </dd> -->
+            </dl>
+
+            <hr>
+    
+            <div class="form-row">
+              <div class="form-group col-md flex-grow-0">
+                <label class="fs-5">Quantity: </label>
+                <div class="input-group mb-4 input-spinner">
+                  <input type="number" class="p-1 fs-5" name="no_of_books" id="books_quantity" value="1" min="1" minlength="1">
+                </div>
+                <!-- <div class="input-group mb-3 input-spinner">
+                  <div class="input-group-prepend">
+                    <button class="btn btn-light" type="button" id="button-plus" onclick="modify_quantity()"> + </button>
+                  </div>
+                  <input type="text" class="form-control" value="1" onchange="get_correct_price()">
+                  <div class="input-group-append">
+                    <button class="btn btn-light" type="button" id="button-minus" onclick="modify_quantity()"> − </button>
+                  </div> -->
+                </div>
+              <!-- </div> col.// -->
+              <!-- <div class="form-group col-md">
+                <label>Select size</label>
+                <div class="mt-1">
+                  <label class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" name="select_size" checked="" class="custom-control-input">
+                    <div class="custom-control-label">Small</div>
+                  </label>
+
+                  <label class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" name="select_size" class="custom-control-input">
+                    <div class="custom-control-label">Medium</div>
+                  </label>
+
+                  <label class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" name="select_size" class="custom-control-input">
+                    <div class="custom-control-label">Large</div>
+                  </label>
+
+                </div>
+              </div> col.//  -->
+            </div> <!-- row.// -->
+
+            {% if book.stock == 0 %}
+              <h3 class="">Sorry, Book stock is not available</h3>
+            {% elif book.stock > 0 %}
+              <!-- <a class="btn btn-primary" href="{% url 'order:order-buynow' book.uid %}" id="buy-now-btn">Buy now</a> -->
+              <a class="btn btn-outline-primary" id="add-to-cart-btn">        
+                <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>
+              </a>
+            {% endif %}
+          </article> <!-- product-info-aside .// -->
+        </main> <!-- col.// -->
+      </div> <!-- row.// -->
+    </div> <!-- card.// -->
+    <!-- ============================ COMPONENT 1 END .// ================================= -->
+  </div>
+</section>
+{% if Recommendations %}
+<section class="product">
+  <h1 class="text-center p-4">Similar Books</h1>
+  <button class="pre-btn"><img src="/media/images/arrow.png" alt=""></button>
+  <button class="nxt-btn"><img src="/media/images/arrow.png" alt=""></button>
+  <div class="product-container overflow-hidden">
+      {% for Book in Recommendations %}
+      <div class="product-card">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                  <figure style="height: 330px;" class="card card-product-grid">
+                      <div class="img-wrap"> 
+                          <img src="/media/{{Book.coverpage}}" width="60" height="60">
+                          <span class="topbar">
+                              <a href="#" class="float-right"><i class="fa fa-heart"></i></a>
+                          </span>
+                          
+                      </div>
+                      
+                      <figcaption class="info-wrap border-top ">
+                          <a style="width: 225px;" href="{% url 'Books:get_book' Book.slug %}" class="title text-wrap"> 
+                              <b>{{Book.name}}</b>
+                          </a>
+                          {% comment %} <div class="py-2">
+                              <i class="fa-solid fa-star checked"></i>
+                              <i class="fa-solid fa-star"></i>
+                              <i class="fa-solid fa-star"></i>
+                              <i class="fa-solid fa-star"></i>
+                              <i class="fa-solid fa-star"></i>
+                          </div> {% endcomment %}
+                          <div class="price mt-2">Rs. {{Book.price}}.00 </div> 
+                      </figcaption>
+                  </figure>
+              </div>
+      </div>
+      {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section-content padding-y bg">
+  <div class="border-top border-bottom my-lg-3 py-5">
+    <div class="container pt-md-2" id="reviews">
+      <!-- Rating bar -->
+      <div class="row pb-3">
+        <div class="col-lg-4 col-md-5">
+          <h2 class="h3 mb-4">{{review_count.get_review_count}} Reviews</h2>
+          <div class="star-rating me-2"><i class="ci-star-filled fs-sm text-accent me-1"></i><i class="ci-star-filled fs-sm text-accent me-1"></i><i class="ci-star-filled fs-sm text-accent me-1"></i><i class="ci-star-filled fs-sm text-accent me-1"></i><i class="ci-star fs-sm text-muted me-1"></i></div><span class="d-inline-block align-middle"><b>{{book.get_average_rating}} Overall rating</b></span>
+          <!-- <p class="pt-3 fs-sm text-muted">58 out of 74 (77%)<br>Customers recommended this product</p> -->
+        </div>
+        <!--<div class="col-lg-8 col-md-7">
+          <div class="d-flex align-items-center mb-2">
+            <div class="text-nowrap me-3"><span class="d-inline-block align-middle text-muted">5</span><i class="ci-star-filled fs-xs ms-1"></i></div>
+            <div class="w-100">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><span class="text-muted ms-3">43</span>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <div class="text-nowrap me-3"><span class="d-inline-block align-middle text-muted">4</span><i class="ci-star-filled fs-xs ms-1"></i></div>
+            <div class="w-100">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar" role="progressbar" style="width: 27%; background-color: #a7e453;" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><span class="text-muted ms-3">16</span>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <div class="text-nowrap me-3"><span class="d-inline-block align-middle text-muted">3</span><i class="ci-star-filled fs-xs ms-1"></i></div>
+            <div class="w-100">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar" role="progressbar" style="width: 17%; background-color: #ffda75;" aria-valuenow="17" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><span class="text-muted ms-3">9</span>
+          </div>
+          <div class="d-flex align-items-center mb-2">
+            <div class="text-nowrap me-3"><span class="d-inline-block align-middle text-muted">2</span><i class="ci-star-filled fs-xs ms-1"></i></div>
+            <div class="w-100">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar" role="progressbar" style="width: 9%; background-color: #fea569;" aria-valuenow="9" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><span class="text-muted ms-3">4</span>
+          </div>
+          <div class="d-flex align-items-center">
+            <div class="text-nowrap me-3"><span class="d-inline-block align-middle text-muted">1</span><i class="ci-star-filled fs-xs ms-1"></i></div>
+            <div class="w-100">
+              <div class="progress" style="height: 4px;">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: 4%;" aria-valuenow="4" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div><span class="text-muted ms-3">2</span>
+          </div>
+        </div>-->
+      </div>
+      <!-- Rating bar end -->
+
+
+
+      <hr class="mt-4 mb-3">
+
+
+
+      <div class="row pt-4">
+        <!-- Reviews list-->
+        <div class="col-md-7">
+          <div class="d-flex justify-content-end pb-4">
+            <div class="d-flex align-items-center flex-nowrap">
+              <!-- <label class="fs-sm text-muted text-nowrap me-2 d-none d-sm-block" for="sort-reviews">Sort by:</label>
+              <select class="form-select form-select-sm" id="sort-reviews">
+                <option>Newest</option>
+                <option>Oldest</option>
+                <option>Popular</option>
+                <option>High rating</option>
+                <option>Low rating</option>
+              </select> -->
+            </div>
+          </div>
+
+          <!-- Review-->'
+          {% for review in review_obj_all %}
+          {% if review.customer == request.user %}
+          <div class="product-review pb-4 mb-4 border-bottom">
+            <div class="d-flex mb-3">
+              <div class="d-flex align-items-center me-4 pe-2"><img class="rounded-circle" src="/media/{{review.get_profileimage}}" width="50" alt="Rafael Marquez">
+                <div class="ps-3">
+                  <h6 class="fs-sm mb-0">{{review.customer.username}}</h6>
+                  <h6 class="fs-sm mb-0">{{review.review_star}} star</h6>
+                  <span class="fs-ms text-muted">{{review.created_at}}</span>
+
+                </div>
+              </div>
+              <div>
+                <div class="star-rating">
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star"></i>
+                </div>
+                <!--<div class="fs-ms text-muted">83% of users found this review helpful</div>-->
+              </div>
+            </div>
+            <p class="fs-md mb-2">{{review.review_text}}</p>
+
+            <!-- <div class="text-nowrap">
+              <button class="btn-like" type="button">15</button>
+              <button class="btn-dislike" type="button">3</button>
+            </div> -->
+          </div>
+          {% else %}
+          <div class="product-review pb-4 mb-4 border-bottom">
+            <div class="d-flex mb-3">
+              <div class="d-flex align-items-center me-4 pe-2"><img class="rounded-circle" src="/media/{{review.get_profileimage}}" width="50" alt="Rafael Marquez">
+                <div class="ps-3">
+                  <h6 class="fs-sm mb-0">{{review.customer.username}}</h6>
+                  <h6 class="fs-sm mb-0">{{review.review_star}} star</h6>
+                  <span class="fs-ms text-muted">{{review.created_at}}</span>
+                </div>
+              </div>
+              <div>
+                <div class="star-rating">
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star-filled active"></i>
+                  <i class="star-rating-icon ci-star"></i>
+                </div>
+                <!--<div class="fs-ms text-muted">83% of users found this review helpful</div>-->
+              </div>
+            </div>
+            <p class="fs-md mb-2">{{review.review_text}}</p>
+
+            <!-- <div class="text-nowrap">
+              <button class="btn-like" type="button">15</button>
+              <button class="btn-dislike" type="button">3</button>
+            </div> -->
+          </div>
+          {% endif %}
+          {% endfor %}
+          <!-- Review-->
+          <!-- <div class="product-review pb-4 mb-4 border-bottom">
+            <div class="d-flex mb-3">
+              <div class="d-flex align-items-center me-4 pe-2"><img class="rounded-circle" src="img/shop/reviews/02.jpg" width="50" alt="Barbara Palson">
+                <div class="ps-3">
+                  <h6 class="fs-sm mb-0">Barbara Palson</h6><span class="fs-ms text-muted">May 17, 2019</span>
+                </div>
+              </div>
+              <div>
+                <div class="star-rating"><i class="star-rating-icon ci-star-filled active"></i><i class="star-rating-icon ci-star-filled active"></i><i class="star-rating-icon ci-star-filled active"></i><i class="star-rating-icon ci-star-filled active"></i><i class="star-rating-icon ci-star-filled active"></i>
+                </div>
+                <div class="fs-ms text-muted">99% of users found this review helpful</div>
+              </div>
+            </div>
+            <p class="fs-md mb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+            <ul class="list-unstyled fs-ms pt-1">
+              <li class="mb-1"><span class="fw-medium">Pros:&nbsp;</span>Consequuntur magni, voluptatem sequi, tempora</li>
+              <li class="mb-1"><span class="fw-medium">Cons:&nbsp;</span>Architecto beatae, quis autem</li>
+            </ul>
+            <div class="text-nowrap">
+              <button class="btn-like" type="button">34</button>
+              <button class="btn-dislike" type="button">1</button>
+            </div>
+          </div> -->
+
+          <!-- <div class="text-center">
+            <button class="btn btn-outline-accent" type="button"><i class="ci-reload me-2"></i>Load more reviews</button>
+          </div> -->
+        </div>
+        <!-- Leave review list-->
+
+
+        <!-- Review Form start -->
+        {% if reviewPermit %}
+          <div class="col-md-5 mt-2 pt-4 mt-md-0 pt-md-0">
+            <div class="py-grid-gutter px-grid-gutter rounded-3">
+              <h3 class="h4 pb-2">Write a review</h3>
+              <form class="needs-validation" method="POST" novalidate="">
+                {% csrf_token %}
+                <div class="mb-3">
+                  <input type="text" value="{{book.uid}}" name="Book_uid" hidden required>
+                  <label class="form-label" for="review-rating">Rating<span class="text-danger">*</span></label>
+                  <select class="form-select" required="" id="review-rating" name="Rating_num">
+                    <option value="">Choose rating</option>
+                    <option value="5">5 stars</option>
+                    <option value="4">4 stars</option>
+                    <option value="3">3 stars</option>
+                    <option value="2">2 stars</option>
+                    <option value="1">1 star</option>
+                  </select>
+                  <div class="invalid-feedback">Please choose rating!</div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="review-text">Review<span class="text-danger">*</span></label>
+                  <textarea class="form-control" rows="6" required id="review-text" name="Review_text"></textarea>
+                  <div class="invalid-feedback">Please write a review!</div><small class="form-text text-muted">Your review must be at least 50 characters.</small>
+                </div>
+                <button class="btn btn-primary btn-shadow d-block w-100" type="submit">Submit Review</button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+        <!-- Review Form end -->
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<script>
+    $("#books_quantity").change(function(){
+      let quantity =  $("#books_quantity").val();
+      let price = "{{book.price}}";
+      let total_price = quantity*price;
+      $("#book_price").text(`Rs. ${total_price}.00`);
+    })
+
+    $("#add-to-cart-btn").click(function(){
+      let no_of_books = $("#books_quantity").val();
+      let book_uid = "{{book.uid}}";
+      $.ajax({
+        url: `/accounts/add-to-cart/${book_uid}?no_of_books=${no_of_books}`,
+      })
+      $("#message_addtocart").css("display", "block");
+      $("#message_addtocart").text("Book has been added to cart.")
+    
+      $(document).ajaxStop(
+      setTimeout(function() {
+        window.location.reload();
+      }, 2000)
+    );
+    })
+
+    
+    // {
+    //   $(document).delay(15000)
+    //   window.location.reload();
+    // });
+
+    /*$("#buy-now-btn").click(function(){
+      let no_of_books = $("#books_quantity").val();
+      let book_uid = "{{book.uid}}";
+      $.ajax({
+        url: `/order/order-buynow/${book_uid}?no_of_books=${no_of_books}`,
+      })
+      
+    })*/
+
+</script>
+<script src="/media/js/books_slider_script.js"></script>
+{% endblock %}

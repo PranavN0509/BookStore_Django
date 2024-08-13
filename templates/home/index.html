@@ -1,0 +1,82 @@
+{% extends 'base/base.html' %}
+
+{% block start %}
+<div class="container d-flex flex-column align-items-center justify-content-start gap-5 my-4 h-auto">
+    <!-- <div class="d-flex m-0 p-0">
+		<div class="col">
+			{% include 'home/categoryfilter.html' %}
+		</div>
+		<div class="col-sm-10">
+			{% block container %}{% endblock %}
+		</div>
+	</div> -->
+    {% include "base/alert.html" %}
+    <h1>Latest Books</h1>
+    <div class="d-flex flex-row flex-wrap align-items-center justify-content-center gap-5">
+        {% for Book in Books %}
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <figure style="height: 330px;" class="card card-product-grid">
+                    <div class="img-wrap">
+                        <img src="/media/{{Book.coverpage}}" width="60" height="60">
+                        <span class="topbar">
+                            <!-- <a href="#" class="float-right"><i class="fa fa-heart"></i></a> -->
+                        </span>
+                        <!-- <a class="btn-overlay" href="#"><i class="fa fa-search-plus"></i> Quick view</a> -->
+                    </div>
+
+                    <figcaption class="info-wrap border-top ">
+                        <a style="width: 225px;" href="{% url 'Books:get_book' Book.slug%}" class="title text-wrap">
+                            <b>{{Book.name}}</b>
+                        </a>
+                        <!-- <div class="py-2">
+                            <i class="fa-solid fa-star checked"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div> -->
+                        <div class="price mt-2">Rs. {{Book.price}}.00 </div> <!-- price-wrap.// -->
+                    </figcaption>
+                </figure> <!-- card // -->
+            </div> <!-- col.// -->
+        {% endfor %}
+    </div>
+
+
+
+
+    {% if recommendations %}
+    <h1>Similar Books based On Previous Orders</h1>
+    <div class="d-flex flex-row flex-wrap align-items-center justify-content-center gap-5">
+        {% for Book in recommendations %}
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <figure style="height: 330px;" class="card card-product-grid">
+                    <div class="img-wrap">
+                        <img src="/media/{{Book.coverpage}}" width="60" height="60">
+                        <span class="topbar">
+                            <!-- <a href="#" class="float-right"><i class="fa fa-heart"></i></a> -->
+                        </span>
+                        <!-- <a class="btn-overlay" href="#"><i class="fa fa-search-plus"></i> Quick view</a> -->
+                    </div>
+
+                    <figcaption class="info-wrap border-top ">
+                        <a style="width: 225px;" href="{% url 'Books:get_book' Book.slug %}" class="title text-wrap">
+                            <b>{{Book.name}}</b>
+                        </a>
+                        <!-- <div class="py-2">
+                            <i class="fa-solid fa-star checked"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                            <i class="fa-solid fa-star"></i>
+                        </div> -->
+                        <div class="price mt-2">Rs. {{Book.price}}.00 </div> <!-- price-wrap.// -->
+                    </figcaption>
+                </figure> <!-- card // -->
+            </div> <!-- col.// -->
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

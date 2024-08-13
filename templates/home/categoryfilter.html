@@ -1,0 +1,8 @@
+			<ul class="list-group list-group-flush">
+				<li class="list-group-item"><h4>Category</h4></li>
+				<li class="list-group-item"><a class="text-decoration-none" href="{% url 'home:allbooks' %}"><strong>All Books</strong></a></li>
+				{% for category in categories %}
+				<li class="list-group-item d-flex flex-row align-items-center justify-content-start gap-3"><img src="/media/{{category.icon}}" width="30" height="30" alt=""> <a class="text-decoration-none" href="{% url 'home:category_filter' category.uid %}"><strong>{{category.name}}</strong></a></li>
+				{% endfor %}		
+			</ul> 
+			
